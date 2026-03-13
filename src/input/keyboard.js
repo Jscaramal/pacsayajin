@@ -17,14 +17,15 @@ export function bindKeyboard(game) {
 
     const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
     if (event.key.length === 1) {
-      secretBuffer = `${secretBuffer}${key}`.slice(-4);
+      secretBuffer = `${secretBuffer}${key}`.slice(-8);
       if (secretBuffer === "_pop") {
         game.toggleSecretDebug();
         secretBuffer = "";
         return;
       }
-      if (secretBuffer.endsWith("l2")) {
-        game.triggerLevel2Test();
+      const levelShortcut = secretBuffer.match(/l(\d+)$/);
+      if (levelShortcut) {
+        game.goToLevelTest(Number(levelShortcut[1]));
         secretBuffer = "";
         return;
       }
