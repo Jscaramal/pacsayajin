@@ -23,12 +23,7 @@ const elements = {
   nickname: document.getElementById("nicknameInput"),
   rankingList: document.getElementById("rankingList"),
   playerHint: document.getElementById("playerHint"),
-  appVersion: document.getElementById("appVersion"),
-  touchUp: document.getElementById("touchUp"),
-  touchLeft: document.getElementById("touchLeft"),
-  touchRight: document.getElementById("touchRight"),
-  touchDown: document.getElementById("touchDown"),
-  touchPause: document.getElementById("touchPause")
+  appVersion: document.getElementById("appVersion")
 };
 
 elements.appVersion.textContent = `Version ${APP_VERSION}`;

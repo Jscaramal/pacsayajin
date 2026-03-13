@@ -317,8 +317,8 @@ export class CanvasRenderer {
       ctx.font = "bold 18px Arial";
       ctx.lineWidth = 6;
       ctx.strokeStyle = "rgba(0, 0, 0, 0.92)";
-      ctx.strokeText("Pressione espaco para continuar", canvas.width / 2, canvas.height / 2 + 26);
-      ctx.fillText("Pressione espaco para continuar", canvas.width / 2, canvas.height / 2 + 26);
+      ctx.strokeText("Pressione espaco ou toque 2x para continuar", canvas.width / 2, canvas.height / 2 + 26);
+      ctx.fillText("Pressione espaco ou toque 2x para continuar", canvas.width / 2, canvas.height / 2 + 26);
     } else if (state.won) {
       ctx.fillText("YOU WIN!", canvas.width / 2, canvas.height / 2 - 10);
       ctx.fillStyle = "#fff";

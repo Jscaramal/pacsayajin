@@ -30,24 +30,7 @@ function sanitizeNick(value) {
 }
 
 function bindTouchControls(game, elements) {
-  bindTouchButton(elements.touchPause, () => {
-    game.audio.ensure();
-    game.togglePause();
-  });
   bindCanvasSwipe(game, elements.canvas);
-}
-
-function bindTouchButton(button, onPress) {
-  if (!button) return;
-
-  button.addEventListener("pointerdown", (event) => {
-    event.preventDefault();
-    onPress();
-  });
-
-  button.addEventListener("click", (event) => {
-    event.preventDefault();
-  });
 }
 
 function move(game, direction) {
@@ -66,6 +49,7 @@ function bindCanvasSwipe(game, canvas) {
   let touchStartX = 0;
   let touchStartY = 0;
   let touchActive = false;
+  let lastTapAt = 0;
 
   canvas.addEventListener("pointerdown", (event) => {
     if (event.pointerType !== "touch") return;
@@ -103,10 +87,21 @@ function bindCanvasSwipe(game, canvas) {
   canvas.addEventListener("touchstart", (event) => {
     const touch = event.touches[0];
     if (!touch) return;
+    const now = Date.now();
+    if (now - lastTapAt < 280) {
+      event.preventDefault();
+      game.audio.ensure();
+      game.togglePause();
+      lastTapAt = 0;
+      touchActive = false;
+      return;
+    }
+
+    lastTapAt = now;
     touchActive = true;
     touchStartX = touch.clientX;
     touchStartY = touch.clientY;
-  }, { passive: true });
+  }, { passive: false });
 
   canvas.addEventListener("touchmove", (event) => {
     const touch = event.touches[0];

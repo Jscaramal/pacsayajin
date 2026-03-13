@@ -115,21 +115,13 @@ canvas {
   touch-action: none;
 }
 
-.touch-btn {
-  min-height: 64px;
-  border-radius: 18px;
-  padding: 0;
-  font-size: 26px;
-  line-height: 1;
-  background: rgba(255, 228, 77, 0.92);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.28);
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-}
-
-.touch-pause {
-  background: rgba(255, 255, 255, 0.88);
+.touch-hint {
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 canvas.damage-flash {
@@ -331,13 +323,6 @@ input:focus {
 
   .touch-controls {
     display: flex;
-  }
-
-  .touch-up,
-  .touch-left,
-  .touch-right,
-  .touch-down {
-    display: none;
   }
 
   canvas,
