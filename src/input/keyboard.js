@@ -10,10 +10,51 @@ const KEY_TO_DIR = {
 };
 
 export function bindKeyboard(game) {
+  let secretBuffer = "";
+
   window.addEventListener("keydown", (event) => {
     if (isEditableTarget(event.target)) return;
 
     const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+    if (event.key.length === 1) {
+      secretBuffer = `${secretBuffer}${key}`.slice(-4);
+      if (secretBuffer === "_pop") {
+        game.toggleSecretDebug();
+        secretBuffer = "";
+        return;
+      }
+    }
+
+    if (key === "b") {
+      event.preventDefault();
+      game.triggerBossTest();
+      return;
+    }
+
+    if (key === "p") {
+      event.preventDefault();
+      game.triggerPowerTest();
+      return;
+    }
+
+    if (key === "h") {
+      event.preventDefault();
+      game.restoreLifeTest();
+      return;
+    }
+
+    if (key === "n") {
+      event.preventDefault();
+      game.disableBossTest();
+      return;
+    }
+
+    if (key === "g") {
+      event.preventDefault();
+      game.toggleGhostMovementTest();
+      return;
+    }
+
     if (key === " ") {
       event.preventDefault();
       game.togglePause();

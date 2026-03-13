@@ -1,5 +1,4 @@
 const SCOREBOARD_KEY = "pac-sayajin-ranking";
-const HIGHSCORE_KEY = "pac-sayajin-highscore";
 const LAST_NICK_KEY = "pac-sayajin-last-nick";
 
 export class StorageService {
@@ -9,11 +8,7 @@ export class StorageService {
   }
 
   getHighscore() {
-    return Number(localStorage.getItem(HIGHSCORE_KEY) || 0);
-  }
-
-  saveHighscore(score) {
-    localStorage.setItem(HIGHSCORE_KEY, String(score));
+    return Number(this.ranking[0]?.score || 0);
   }
 
   getLastNick() {

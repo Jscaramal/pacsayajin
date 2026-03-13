@@ -7,6 +7,7 @@ import {
   FRIGHTENED_DURATION,
   INVULNERABLE_FRAMES,
   MAX_LIVES,
+  BOSS_SPEED,
   NORMAL_SPEED,
   POWER_SPEED
 } from "../core/constants.js";
@@ -27,7 +28,6 @@ export function collectPellet(state) {
   }
 
   maybeReleaseBoss(state);
-  syncHighscore(state);
 }
 
 export function handleGhostCollisions(state) {
@@ -53,7 +53,7 @@ export function updatePowerMode(state) {
   }
 
   const powerActive = state.frightenedTimer > 0;
-  state.pacman.speed = powerActive ? POWER_SPEED : NORMAL_SPEED;
+  state.pacman.speed = powerActive ? getPoweredPacmanSpeed(state) : NORMAL_SPEED;
   state.ghosts.forEach((ghost) => {
     ghost.frightened = powerActive && !ghost.isBoss;
   });
@@ -72,7 +72,7 @@ export function activatePower(state, duration) {
   state.frightenedTimer = duration;
   state.safeTimer = 0;
   state.eatenGhostCombo = 0;
-  state.pacman.speed = POWER_SPEED;
+  state.pacman.speed = getPoweredPacmanSpeed(state);
   state.ghosts.forEach((ghost) => {
     if (!ghost.isBoss) ghost.frightened = true;
   });
@@ -96,13 +96,6 @@ export function hasWon(state) {
   return true;
 }
 
-function syncHighscore(state) {
-  if (state.score > state.highscore) {
-    state.highscore = state.score;
-    state.storage.saveHighscore(state.highscore);
-  }
-}
-
 function didActorsCollide(left, right) {
   return (
     (left.x === right.x && left.y === right.y)
@@ -122,7 +115,6 @@ function eatGhost(state, ghost) {
   }
   sendGhostToBase(ghost, EATEN_RESPAWN_FRAMES);
   ghost.frightened = state.frightenedTimer > 0;
-  syncHighscore(state);
 }
 
 function damagePacman(state, ghost) {
@@ -178,4 +170,8 @@ function maybeReleaseBoss(state) {
   state.bossTriggered = true;
   state.bossIntroTimer = state.bossIntroDuration;
   state.audio.playBossIntro();
+}
+
+function getPoweredPacmanSpeed(state) {
+  return state.ghosts.some((ghost) => ghost.isBoss) ? BOSS_SPEED : POWER_SPEED;
 }
