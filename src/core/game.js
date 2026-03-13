@@ -8,6 +8,7 @@ import {
 } from "./constants.js";
 import { LEVEL_01 } from "../data/level-01.js";
 import { LEVEL_02 } from "../data/level-02.js";
+import { LEVEL_03 } from "../data/level-03.js";
 import { chooseGhostDir, updateGhostState } from "../domain/ghost-ai.js";
 import {
   activatePower,
@@ -22,6 +23,12 @@ import { buildLevel } from "../domain/level.js";
 import { moveActor } from "../domain/movement.js";
 import { createBoss } from "../domain/entities.js";
 import { renderHud, renderRanking } from "../render/hud-renderer.js";
+
+const LEVELS = {
+  1: LEVEL_01,
+  2: LEVEL_02,
+  3: LEVEL_03
+};
 
 export class Game {
   constructor({ renderer, storage, audio, elements }) {
@@ -69,7 +76,7 @@ export class Game {
   }
 
   applyLevelToState(state, levelNumber) {
-    const levelMap = levelNumber === 2 ? LEVEL_02 : LEVEL_01;
+    const levelMap = LEVELS[levelNumber] || LEVEL_01;
     const level = buildLevel(levelMap);
     const baseTileSet = new Set(level.baseTiles.map(({ x, y }) => `${x},${y}`));
 
@@ -182,7 +189,7 @@ export class Game {
     const { state } = this;
     if (state.gameOver || (!state.secretDebugEnabled && !force)) return;
 
-    const level = buildLevel(this.state.currentLevel === 2 ? LEVEL_02 : LEVEL_01);
+    const level = buildLevel(LEVELS[this.state.currentLevel] || LEVEL_01);
     state.ghosts = level.ghosts;
     state.spawn.ghosts = level.ghosts.map((ghost) => ({ x: ghost.x, y: ghost.y }));
     state.bossTriggered = false;
@@ -206,9 +213,16 @@ export class Game {
     this.render();
   }
 
-  triggerLevel2Test() {
+  goToLevelTest(levelNumber) {
     if (this.state.gameOver || !this.state.secretDebugEnabled) return;
-    this.advanceToNextLevel();
+    if (!LEVELS[levelNumber]) return;
+
+    this.state.started = false;
+    this.state.startArmed = true;
+    this.state.paused = false;
+    this.applyLevelToState(this.state, levelNumber);
+    this.state.levelTransition = true;
+    this.render();
   }
 
   tick() {
@@ -238,7 +252,7 @@ export class Game {
     if (state.pacman.progress === 0) {
       collectPellet(state);
       if (hasWon(state)) {
-        if (state.currentLevel === 1) {
+        if (LEVELS[state.currentLevel + 1]) {
           this.advanceToNextLevel();
         } else {
           state.won = true;
@@ -292,12 +306,7 @@ export class Game {
   }
 
   advanceToNextLevel() {
-    this.state.started = false;
-    this.state.startArmed = true;
-    this.state.paused = false;
-    this.applyLevelToState(this.state, 2);
-    this.state.levelTransition = true;
-    this.render();
+    this.goToLevelTest(this.state.currentLevel + 1);
   }
 
   render() {

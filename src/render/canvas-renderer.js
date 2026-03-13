@@ -19,7 +19,7 @@ export class CanvasRenderer {
   drawMap(state) {
     const { ctx, canvas } = this;
     const bossActive = state.ghosts.some((ghost) => ghost.isBoss);
-    const levelTwo = state.currentLevel === 2;
+    const palette = getLevelPalette(state.currentLevel, bossActive);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "#000";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -31,23 +31,17 @@ export class CanvasRenderer {
         const py = y * TILE;
 
         if (cell === "#") {
-          const wallFill = levelTwo
-            ? (bossActive ? "#3d0d57" : "#6d2bbd")
-            : (bossActive ? "#0b1d6b" : "#163cff");
-          const wallStroke = levelTwo
-            ? (bossActive ? "rgba(245, 210, 255, 0.3)" : "#d49cff")
-            : (bossActive ? "rgba(210, 220, 255, 0.28)" : "#77a0ff");
-          ctx.fillStyle = wallFill;
+          ctx.fillStyle = palette.wallFill;
           roundRect(ctx, px + 2, py + 2, TILE - 4, TILE - 4, 8, true, false);
-          ctx.strokeStyle = wallStroke;
+          ctx.strokeStyle = palette.wallStroke;
           ctx.lineWidth = 2;
           roundRect(ctx, px + 4, py + 4, TILE - 8, TILE - 8, 6, false, true);
 
           if (bossActive) {
             ctx.save();
             ctx.shadowBlur = 10;
-            ctx.shadowColor = "rgba(228, 236, 255, 0.18)";
-            ctx.strokeStyle = "rgba(228, 236, 255, 0.14)";
+            ctx.shadowColor = palette.bossGlow;
+            ctx.strokeStyle = palette.bossStroke;
             ctx.lineWidth = 1.5;
             roundRect(ctx, px + 5, py + 5, TILE - 10, TILE - 10, 5, false, true);
             ctx.restore();
@@ -354,6 +348,33 @@ export class CanvasRenderer {
 
     ctx.restore();
   }
+}
+
+function getLevelPalette(level, bossActive) {
+  if (level === 2) {
+    return {
+      wallFill: bossActive ? "#3d0d57" : "#6d2bbd",
+      wallStroke: bossActive ? "rgba(245, 210, 255, 0.3)" : "#d49cff",
+      bossGlow: "rgba(245, 220, 255, 0.18)",
+      bossStroke: "rgba(245, 220, 255, 0.14)"
+    };
+  }
+
+  if (level === 3) {
+    return {
+      wallFill: bossActive ? "#0b3b37" : "#0fc5a6",
+      wallStroke: bossActive ? "rgba(210, 255, 243, 0.3)" : "#9cffeb",
+      bossGlow: "rgba(210, 255, 243, 0.2)",
+      bossStroke: "rgba(210, 255, 243, 0.16)"
+    };
+  }
+
+  return {
+    wallFill: bossActive ? "#0b1d6b" : "#163cff",
+    wallStroke: bossActive ? "rgba(210, 220, 255, 0.28)" : "#77a0ff",
+    bossGlow: "rgba(228, 236, 255, 0.18)",
+    bossStroke: "rgba(228, 236, 255, 0.14)"
+  };
 }
 
 function createPacmanSpriteSet() {
