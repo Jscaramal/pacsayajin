@@ -297,8 +297,8 @@ export class CanvasRenderer {
       ctx.font = "bold 18px Arial";
       ctx.lineWidth = 6;
       ctx.strokeStyle = "rgba(0, 0, 0, 0.92)";
-      ctx.strokeText("Pressione uma seta ou WASD para comecar", canvas.width / 2, canvas.height / 2 + 26);
-      ctx.fillText("Pressione uma seta ou WASD para comecar", canvas.width / 2, canvas.height / 2 + 26);
+      ctx.strokeText("Use seta, WASD ou arraste na tela para comecar", canvas.width / 2, canvas.height / 2 + 26);
+      ctx.fillText("Use seta, WASD ou arraste na tela para comecar", canvas.width / 2, canvas.height / 2 + 26);
     } else if (state.bossIntroTimer > 0) {
       const step = Math.max(1, Math.ceil((state.bossIntroTimer / state.bossIntroDuration) * 3));
       ctx.fillStyle = "#fff";

@@ -63,6 +63,9 @@ function bindCanvasSwipe(game, canvas) {
   let startX = 0;
   let startY = 0;
   let activePointerId = null;
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchActive = false;
 
   canvas.addEventListener("pointerdown", (event) => {
     if (event.pointerType !== "touch") return;
@@ -96,4 +99,40 @@ function bindCanvasSwipe(game, canvas) {
 
   canvas.addEventListener("pointerup", clearPointer);
   canvas.addEventListener("pointercancel", clearPointer);
+
+  canvas.addEventListener("touchstart", (event) => {
+    const touch = event.touches[0];
+    if (!touch) return;
+    touchActive = true;
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+  }, { passive: true });
+
+  canvas.addEventListener("touchmove", (event) => {
+    const touch = event.touches[0];
+    if (!touch || !touchActive) return;
+
+    const deltaX = touch.clientX - touchStartX;
+    const deltaY = touch.clientY - touchStartY;
+    const threshold = 18;
+
+    if (Math.abs(deltaX) < threshold && Math.abs(deltaY) < threshold) return;
+
+    event.preventDefault();
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      move(game, deltaX > 0 ? "right" : "left");
+    } else {
+      move(game, deltaY > 0 ? "down" : "up");
+    }
+
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+  }, { passive: false });
+
+  const clearTouch = () => {
+    touchActive = false;
+  };
+
+  canvas.addEventListener("touchend", clearTouch, { passive: true });
+  canvas.addEventListener("touchcancel", clearTouch, { passive: true });
 }
