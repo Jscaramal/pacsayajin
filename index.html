@@ -22,10 +22,20 @@
         <span><b>Pausa</b> espaço</span>
         <button id="restartBtn" type="button">Reiniciar</button>
       </section>
+      <section class="touch-controls" aria-label="Controles touch">
+        <button class="touch-btn touch-up" id="touchUp" type="button" aria-label="Mover para cima">▲</button>
+        <button class="touch-btn touch-left" id="touchLeft" type="button" aria-label="Mover para esquerda">◀</button>
+        <button class="touch-btn touch-pause" id="touchPause" type="button" aria-label="Pausar">II</button>
+        <button class="touch-btn touch-right" id="touchRight" type="button" aria-label="Mover para direita">▶</button>
+        <button class="touch-btn touch-down" id="touchDown" type="button" aria-label="Mover para baixo">▼</button>
+      </section>
     </main>
     <aside class="sidebar">
       <section class="sidebar-card">
-        <h2 class="sidebar-title">Jogador</h2>
+        <div class="sidebar-header">
+          <h2 class="sidebar-title">Jogador</h2>
+          <span class="version-badge" id="appVersion">Version 1.0.0</span>
+        </div>
         <div class="start-form">
           <label class="label" for="nicknameInput">Nick</label>
           <div class="start-row">

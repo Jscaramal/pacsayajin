@@ -1,4 +1,5 @@
 import { Game } from "./core/game.js";
+import { APP_VERSION } from "./config/app-config.js";
 import {
   SUPABASE_ANON_KEY,
   SUPABASE_RANKING_TABLE,
@@ -21,8 +22,16 @@ const elements = {
   startBtn: document.getElementById("startBtn"),
   nickname: document.getElementById("nicknameInput"),
   rankingList: document.getElementById("rankingList"),
-  playerHint: document.getElementById("playerHint")
+  playerHint: document.getElementById("playerHint"),
+  appVersion: document.getElementById("appVersion"),
+  touchUp: document.getElementById("touchUp"),
+  touchLeft: document.getElementById("touchLeft"),
+  touchRight: document.getElementById("touchRight"),
+  touchDown: document.getElementById("touchDown"),
+  touchPause: document.getElementById("touchPause")
 };
+
+elements.appVersion.textContent = `Version ${APP_VERSION}`;
 
 const remoteRankingService = new SupabaseRankingService({
   url: SUPABASE_URL,
