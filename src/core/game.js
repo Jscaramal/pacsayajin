@@ -8,6 +8,7 @@ import {
 } from "./constants.js";
 import { LEVEL_01 } from "../data/level-01.js";
 import { LEVEL_02 } from "../data/level-02.js";
+import { LEVEL_03 } from "../data/level-03.js";
 import { chooseGhostDir, updateGhostState } from "../domain/ghost-ai.js";
 import {
   activatePower,
@@ -25,7 +26,8 @@ import { renderHud, renderRanking } from "../render/hud-renderer.js";
 
 const LEVELS = {
   1: LEVEL_01,
-  2: LEVEL_02
+  2: LEVEL_02,
+  3: LEVEL_03
 };
 
 export class Game {
@@ -250,7 +252,7 @@ export class Game {
     if (state.pacman.progress === 0) {
       collectPellet(state);
       if (hasWon(state)) {
-        if (state.currentLevel === 1) {
+        if (LEVELS[state.currentLevel + 1]) {
           this.advanceToNextLevel();
         } else {
           state.won = true;
