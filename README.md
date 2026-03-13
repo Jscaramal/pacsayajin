@@ -26,8 +26,6 @@ O ranking funciona de duas formas:
 - `localStorage` como fallback local
 - `Supabase` como backend online, quando configurado
 
-As instrucoes de configuracao do banco estao em [SUPABASE.md](./SUPABASE.md).
-
 ## Publicacao
 
 O repositorio foi preparado para publicar o jogo via GitHub Pages a partir do proprio `index.html`.
