@@ -10,6 +10,8 @@ export function renderHud(state, elements) {
 
   if (!state.startArmed) {
     elements.status.textContent = "Aguardando Start";
+  } else if (state.levelTransition) {
+    elements.status.textContent = `Level ${state.currentLevel}`;
   } else if (state.bossIntroTimer > 0) {
     elements.status.textContent = "Boss chegando";
   } else if (!state.started) {

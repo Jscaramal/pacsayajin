@@ -7,6 +7,7 @@ import {
   MAX_LIVES
 } from "./constants.js";
 import { LEVEL_01 } from "../data/level-01.js";
+import { LEVEL_02 } from "../data/level-02.js";
 import { chooseGhostDir, updateGhostState } from "../domain/ghost-ai.js";
 import {
   activatePower,
@@ -34,22 +35,7 @@ export class Game {
   }
 
   createState() {
-    const level = buildLevel(LEVEL_01);
-    const baseTileSet = new Set(level.baseTiles.map(({ x, y }) => `${x},${y}`));
-
-    return {
-      map: level.map,
-      pacman: level.pacman,
-      ghosts: level.ghosts,
-      baseTiles: level.baseTiles,
-      baseTileSet,
-      baseDoor: level.baseDoor,
-      pelletsLeft: level.pelletsLeft,
-      totalPellets: level.totalPellets,
-      spawn: {
-        pacman: { x: level.pacman.x, y: level.pacman.y },
-        ghosts: level.ghosts.map((ghost) => ({ x: ghost.x, y: ghost.y }))
-      },
+    const state = {
       score: 0,
       highscore: this.storage.getHighscore(),
       lives: MAX_LIVES,
@@ -72,9 +58,41 @@ export class Game {
       bossIntroTimer: 0,
       bossIntroDuration: BOSS_INTRO_DURATION,
       bossBannerTimer: 0,
+      currentLevel: 1,
+      levelTransition: false,
       storage: this.storage,
       audio: this.audio
     };
+
+    this.applyLevelToState(state, 1);
+    return state;
+  }
+
+  applyLevelToState(state, levelNumber) {
+    const levelMap = levelNumber === 2 ? LEVEL_02 : LEVEL_01;
+    const level = buildLevel(levelMap);
+    const baseTileSet = new Set(level.baseTiles.map(({ x, y }) => `${x},${y}`));
+
+    state.map = level.map;
+    state.pacman = level.pacman;
+    state.ghosts = level.ghosts;
+    state.baseTiles = level.baseTiles;
+    state.baseTileSet = baseTileSet;
+    state.baseDoor = level.baseDoor;
+    state.pelletsLeft = level.pelletsLeft;
+    state.totalPellets = level.totalPellets;
+    state.spawn = {
+      pacman: { x: level.pacman.x, y: level.pacman.y },
+      ghosts: level.ghosts.map((ghost) => ({ x: ghost.x, y: ghost.y }))
+    };
+    state.currentLevel = levelNumber;
+    state.bossTriggered = false;
+    state.bossIntroTimer = 0;
+    state.bossBannerTimer = 0;
+    state.frightenedTimer = 0;
+    state.safeTimer = 0;
+    state.eatenGhostCombo = 0;
+    state.ghostMovementLocked = false;
   }
 
   syncHighscoreFromRanking() {
@@ -89,7 +107,10 @@ export class Game {
   }
 
   start() {
-    if (!this.state.gameOver && this.state.startArmed) this.state.started = true;
+    if (!this.state.gameOver && this.state.startArmed) {
+      this.state.started = true;
+      this.state.levelTransition = false;
+    }
   }
 
   restart() {
@@ -161,7 +182,7 @@ export class Game {
     const { state } = this;
     if (state.gameOver || (!state.secretDebugEnabled && !force)) return;
 
-    const level = buildLevel(LEVEL_01);
+    const level = buildLevel(this.state.currentLevel === 2 ? LEVEL_02 : LEVEL_01);
     state.ghosts = level.ghosts;
     state.spawn.ghosts = level.ghosts.map((ghost) => ({ x: ghost.x, y: ghost.y }));
     state.bossTriggered = false;
@@ -212,7 +233,14 @@ export class Game {
     if (state.pacman.progress === 0) {
       collectPellet(state);
       if (hasWon(state)) {
-        this.persistScore();
+        if (state.currentLevel === 1) {
+          this.advanceToNextLevel();
+        } else {
+          state.won = true;
+          state.gameOver = true;
+          state.audio.playWin();
+          this.persistScore();
+        }
         return;
       }
     }
@@ -256,6 +284,15 @@ export class Game {
         });
     }
     this.state.scoreSaved = true;
+  }
+
+  advanceToNextLevel() {
+    this.state.started = false;
+    this.state.startArmed = true;
+    this.state.paused = false;
+    this.applyLevelToState(this.state, 2);
+    this.state.levelTransition = true;
+    this.render();
   }
 
   render() {
