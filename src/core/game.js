@@ -3,11 +3,13 @@ import {
   BOSS_BANNER_DURATION,
   BOSS_INTRO_DURATION,
   FPS,
+  FRIGHTENED_DURATION,
   MAX_LIVES
 } from "./constants.js";
 import { LEVEL_01 } from "../data/level-01.js";
 import { chooseGhostDir, updateGhostState } from "../domain/ghost-ai.js";
 import {
+  activatePower,
   collectPellet,
   handleGhostCollisions,
   hasWon,
@@ -58,6 +60,8 @@ export class Game {
       gameOver: false,
       won: false,
       nickname: this.storage.getLastNick(),
+      secretDebugEnabled: false,
+      ghostMovementLocked: false,
       scoreSaved: false,
       damageFlashTimer: 0,
       invulnerableTimer: 0,
@@ -71,6 +75,10 @@ export class Game {
       storage: this.storage,
       audio: this.audio
     };
+  }
+
+  syncHighscoreFromRanking() {
+    this.state.highscore = this.storage.getHighscore();
   }
 
   armStart() {
@@ -101,9 +109,80 @@ export class Game {
   setNickname(nickname) {
     this.state.nickname = nickname;
     this.storage.saveLastNick(nickname);
-    this.elements.playerHint.textContent = nickname
-      ? `Pontuacoes serao salvas para ${nickname}.`
+    this.updatePlayerHint();
+  }
+
+  toggleSecretDebug() {
+    this.state.secretDebugEnabled = !this.state.secretDebugEnabled;
+    if (!this.state.secretDebugEnabled) {
+      this.state.score = 0;
+      this.state.ghostMovementLocked = false;
+      this.state.frightenedTimer = 0;
+      this.disableBossTest(true);
+    }
+    this.updatePlayerHint();
+    this.render();
+  }
+
+  updatePlayerHint() {
+    if (this.state.secretDebugEnabled) {
+      this.elements.playerHint.textContent = "Modo teste ativo. Esta partida nao salva ranking.";
+      return;
+    }
+
+    this.elements.playerHint.textContent = this.state.nickname
+      ? `Pontuacoes serao salvas para ${this.state.nickname}.`
       : "Defina seu nick para salvar o ranking.";
+  }
+
+  triggerBossTest() {
+    const { state } = this;
+    if (state.gameOver || !state.secretDebugEnabled) return;
+    state.bossTriggered = true;
+    state.bossIntroTimer = 0;
+    state.bossBannerTimer = BOSS_BANNER_DURATION;
+    state.ghosts = [createBoss(state.baseDoor.x, state.baseDoor.y + 1)];
+    this.render();
+  }
+
+  triggerPowerTest() {
+    if (this.state.gameOver || !this.state.secretDebugEnabled) return;
+    activatePower(this.state, FRIGHTENED_DURATION);
+    this.render();
+  }
+
+  restoreLifeTest() {
+    if (this.state.gameOver || !this.state.secretDebugEnabled) return;
+    this.state.lives = Math.min(MAX_LIVES, this.state.lives + 1);
+    this.render();
+  }
+
+  disableBossTest(force = false) {
+    const { state } = this;
+    if (state.gameOver || (!state.secretDebugEnabled && !force)) return;
+
+    const level = buildLevel(LEVEL_01);
+    state.ghosts = level.ghosts;
+    state.spawn.ghosts = level.ghosts.map((ghost) => ({ x: ghost.x, y: ghost.y }));
+    state.bossTriggered = false;
+    state.bossIntroTimer = 0;
+    state.bossBannerTimer = 0;
+    state.ghosts.forEach((ghost) => {
+      ghost.frightened = state.frightenedTimer > 0;
+    });
+    if (!force) this.render();
+  }
+
+  toggleGhostMovementTest() {
+    const { state } = this;
+    if (state.gameOver || !state.secretDebugEnabled) return;
+    state.ghostMovementLocked = !state.ghostMovementLocked;
+    if (state.ghostMovementLocked) {
+      state.ghosts.forEach((ghost) => {
+        ghost.progress = 0;
+      });
+    }
+    this.render();
   }
 
   tick() {
@@ -142,6 +221,11 @@ export class Game {
     state.pacman.mouth = (Math.sin(state.pacman.anim) + 1) / 2;
 
     state.ghosts.forEach((ghost) => {
+      if (state.ghostMovementLocked) {
+        ghost.progress = 0;
+        return;
+      }
+
       updateGhostState(state, ghost);
       if (ghost.respawnTimer > 0 || ghost.freezeTimer > 0) {
         ghost.progress = 0;
@@ -163,10 +247,13 @@ export class Game {
 
   persistScore() {
     if (this.state.scoreSaved) return;
-    if (this.state.nickname) {
+    if (this.state.nickname && !this.state.secretDebugEnabled) {
       this.storage
         .saveRankingEntry(this.state.nickname, this.state.score)
-        .finally(() => renderRanking(this.storage, this.elements.rankingList));
+        .finally(() => {
+          this.syncHighscoreFromRanking();
+          renderRanking(this.storage, this.elements.rankingList);
+        });
     }
     this.state.scoreSaved = true;
   }
@@ -204,7 +291,10 @@ export class Game {
     this.setNickname(this.state.nickname);
     this.storage
       .loadRanking()
-      .finally(() => renderRanking(this.storage, this.elements.rankingList));
+      .finally(() => {
+        this.syncHighscoreFromRanking();
+        renderRanking(this.storage, this.elements.rankingList);
+      });
     this.render();
     window.requestAnimationFrame(this.loop);
   }

@@ -1,3 +1,5 @@
+import { FPS } from "../core/constants.js";
+
 export function renderHud(state, elements) {
   elements.score.textContent = String(state.score);
   elements.highscore.textContent = String(state.highscore);
@@ -19,9 +21,13 @@ export function renderHud(state, elements) {
   } else if (state.gameOver) {
     elements.status.textContent = "Game Over";
   } else if (state.frightenedTimer > 0) {
-    elements.status.textContent = "Super Sayajin";
+    elements.status.textContent = `Super Sayajin ${Math.ceil(state.frightenedTimer / FPS)}s`;
   } else {
     elements.status.textContent = "Jogando";
+  }
+
+  if (state.secretDebugEnabled) {
+    elements.status.textContent = `${elements.status.textContent} [TESTE]`;
   }
 }
 

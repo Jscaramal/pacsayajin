@@ -11,12 +11,14 @@ export class CanvasRenderer {
   render(state) {
     this.drawMap(state);
     this.drawPacman(state.pacman, state.frightenedTimer);
+    this.drawPacmanPowerTimer(state.pacman, state.frightenedTimer);
     state.ghosts.forEach((ghost) => this.drawGhost(ghost, state.frightenedTimer));
     this.drawOverlay(state);
   }
 
   drawMap(state) {
     const { ctx, canvas } = this;
+    const bossActive = state.ghosts.some((ghost) => ghost.isBoss);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "#000";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -28,11 +30,21 @@ export class CanvasRenderer {
         const py = y * TILE;
 
         if (cell === "#") {
-          ctx.fillStyle = "#163cff";
+          ctx.fillStyle = bossActive ? "#0b1d6b" : "#163cff";
           roundRect(ctx, px + 2, py + 2, TILE - 4, TILE - 4, 8, true, false);
-          ctx.strokeStyle = "#77a0ff";
+          ctx.strokeStyle = bossActive ? "rgba(210, 220, 255, 0.28)" : "#77a0ff";
           ctx.lineWidth = 2;
           roundRect(ctx, px + 4, py + 4, TILE - 8, TILE - 8, 6, false, true);
+
+          if (bossActive) {
+            ctx.save();
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = "rgba(228, 236, 255, 0.18)";
+            ctx.strokeStyle = "rgba(228, 236, 255, 0.14)";
+            ctx.lineWidth = 1.5;
+            roundRect(ctx, px + 5, py + 5, TILE - 10, TILE - 10, 5, false, true);
+            ctx.restore();
+          }
         }
 
         if (cell === ".") {
@@ -69,11 +81,16 @@ export class CanvasRenderer {
   drawPacman(pacman, frightenedTimer) {
     const { ctx } = this;
     const pos = getActorDrawPosition(pacman);
-    const radius = TILE * 0.45;
+    const radius = TILE * 0.45 * 0.85;
     const mouth = 0.18 + pacman.mouth * 0.3;
     const frame = getPacmanFrameIndex(mouth);
     const spriteSet = frightenedTimer > 0 ? this.pacmanSprites.ssj : this.pacmanSprites.normal;
     const sprite = spriteSet[frame];
+
+    if (frightenedTimer > 0) {
+      this.drawAura(pos, "rgba(255, 220, 70, 0.95)", 24, 0.42);
+      this.drawAura(pos, "rgba(255, 180, 0, 0.72)", 38, 0.58);
+    }
 
     if (sprite?.complete) {
       this.drawPacmanSprite(ctx, sprite, pos, radius, pacman.dir, frightenedTimer > 0);
@@ -94,7 +111,7 @@ export class CanvasRenderer {
   }
 
   drawPacmanSprite(ctx, sprite, pos, radius, dir, powered) {
-    const size = powered ? TILE * 1.78 : TILE * 1.42;
+    const size = (powered ? TILE * 1.78 : TILE * 1.42) * 0.85;
     ctx.save();
     ctx.translate(pos.x, pos.y);
     if (dir === "left") {
@@ -192,6 +209,24 @@ export class CanvasRenderer {
     ctx.restore();
   }
 
+  drawPacmanPowerTimer(pacman, frightenedTimer) {
+    if (frightenedTimer <= 0) return;
+
+    const { ctx } = this;
+    const pos = getActorDrawPosition(pacman);
+    const seconds = Math.ceil(frightenedTimer / FPS);
+
+    ctx.save();
+    ctx.textAlign = "center";
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = "rgba(0, 0, 0, 0.75)";
+    ctx.fillStyle = "#ffe44d";
+    ctx.font = "bold 16px Arial";
+    ctx.strokeText(`${seconds}s`, pos.x, pos.y - TILE * 0.95);
+    ctx.fillText(`${seconds}s`, pos.x, pos.y - TILE * 0.95);
+    ctx.restore();
+  }
+
   drawAura(pos, color, blur, radiusScale = 0.22) {
     const { ctx } = this;
     ctx.save();
@@ -252,11 +287,17 @@ export class CanvasRenderer {
       ctx.fillText("PAC-SAYAJIN", canvas.width / 2, canvas.height / 2 - 10);
       ctx.fillStyle = "#fff";
       ctx.font = "bold 18px Arial";
-      ctx.fillText("Clique em Start para preparar a partida", canvas.width / 2, canvas.height / 2 + 26);
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = "rgba(0, 0, 0, 0.9)";
+      ctx.strokeText("Insira seu Nick no campo e clique em Start.", canvas.width / 2, canvas.height / 2 + 26);
+      ctx.fillText("Insira seu Nick no campo e clique em Start.", canvas.width / 2, canvas.height / 2 + 26);
     } else if (!state.started) {
       ctx.fillText("PRONTO!", canvas.width / 2, canvas.height / 2 - 10);
       ctx.fillStyle = "#fff";
       ctx.font = "bold 18px Arial";
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = "rgba(0, 0, 0, 0.92)";
+      ctx.strokeText("Pressione uma seta ou WASD para comecar", canvas.width / 2, canvas.height / 2 + 26);
       ctx.fillText("Pressione uma seta ou WASD para comecar", canvas.width / 2, canvas.height / 2 + 26);
     } else if (state.bossIntroTimer > 0) {
       const step = Math.max(1, Math.ceil((state.bossIntroTimer / state.bossIntroDuration) * 3));
@@ -264,6 +305,9 @@ export class CanvasRenderer {
       ctx.fillText(String(step), canvas.width / 2, canvas.height / 2 - 4);
       ctx.font = "bold 22px Arial";
       ctx.fillStyle = "#ff6e6e";
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = "rgba(0, 0, 0, 0.92)";
+      ctx.strokeText("Boss incoming", canvas.width / 2, canvas.height / 2 + 34);
       ctx.fillText("Boss incoming", canvas.width / 2, canvas.height / 2 + 34);
     } else if (state.bossBannerTimer > 0) {
       ctx.fillText("Boss released", canvas.width / 2, canvas.height / 2);
@@ -271,16 +315,25 @@ export class CanvasRenderer {
       ctx.fillText("PAUSADO", canvas.width / 2, canvas.height / 2 - 10);
       ctx.fillStyle = "#fff";
       ctx.font = "bold 18px Arial";
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = "rgba(0, 0, 0, 0.92)";
+      ctx.strokeText("Pressione espaco para continuar", canvas.width / 2, canvas.height / 2 + 26);
       ctx.fillText("Pressione espaco para continuar", canvas.width / 2, canvas.height / 2 + 26);
     } else if (state.won) {
       ctx.fillText("YOU WIN!", canvas.width / 2, canvas.height / 2 - 10);
       ctx.fillStyle = "#fff";
       ctx.font = "bold 18px Arial";
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = "rgba(0, 0, 0, 0.92)";
+      ctx.strokeText("Clique em Reiniciar para jogar de novo", canvas.width / 2, canvas.height / 2 + 26);
       ctx.fillText("Clique em Reiniciar para jogar de novo", canvas.width / 2, canvas.height / 2 + 26);
     } else if (state.gameOver) {
       ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 10);
       ctx.fillStyle = "#fff";
       ctx.font = "bold 18px Arial";
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = "rgba(0, 0, 0, 0.92)";
+      ctx.strokeText("Clique em Reiniciar para jogar de novo", canvas.width / 2, canvas.height / 2 + 26);
       ctx.fillText("Clique em Reiniciar para jogar de novo", canvas.width / 2, canvas.height / 2 + 26);
     }
 
