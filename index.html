@@ -13,21 +13,18 @@
       <section class="hud">
         <div class="panel"><span class="label">Pontos</span><span class="value" id="score">0</span></div>
         <div class="panel"><span class="label">Recorde</span><span class="value" id="highscore">0</span></div>
-        <div class="panel"><span class="label">Vidas</span><span class="value hearts" id="lives">❤❤❤</span></div>
+        <div class="panel"><span class="label">Vidas</span><span class="value hearts" id="lives">♥♥♥</span></div>
         <div class="panel"><span class="label">Status</span><span class="value status" id="status">Pronto</span></div>
       </section>
       <canvas id="game" width="588" height="588" aria-label="PAC-SAYAJIN"></canvas>
       <section class="controls">
-        <span><b>Movimento</b> setas ou WASD</span>
-        <span><b>Pausa</b> espaço</span>
+        <span><b>Movimento</b> setas, WASD ou arraste na tela</span>
+        <span><b>Pausa</b> espaco ou 2 toques na tela</span>
+        <button id="infoBtn" type="button">Info</button>
         <button id="restartBtn" type="button">Reiniciar</button>
       </section>
       <section class="touch-controls" aria-label="Controles touch">
-        <button class="touch-btn touch-up" id="touchUp" type="button" aria-label="Mover para cima">▲</button>
-        <button class="touch-btn touch-left" id="touchLeft" type="button" aria-label="Mover para esquerda">◀</button>
-        <button class="touch-btn touch-pause" id="touchPause" type="button" aria-label="Pausar">II</button>
-        <button class="touch-btn touch-right" id="touchRight" type="button" aria-label="Mover para direita">▶</button>
-        <button class="touch-btn touch-down" id="touchDown" type="button" aria-label="Mover para baixo">▼</button>
+        <div class="touch-hint">Arraste na tela para mover. Toque 2x para pausar.</div>
       </section>
     </main>
     <aside class="sidebar">
@@ -52,6 +49,37 @@
         </div>
       </section>
     </aside>
+  </div>
+  <div class="modal-backdrop hidden" id="infoModal" aria-hidden="true">
+    <section class="modal-card" aria-labelledby="infoTitle">
+      <div class="modal-header">
+        <h2 class="modal-title" id="infoTitle">Como Jogar</h2>
+        <button class="modal-close" id="closeInfoBtn" type="button" aria-label="Fechar tutorial">X</button>
+      </div>
+      <div class="modal-body">
+        <div class="tutorial-block">
+          <h3>Pac-Man</h3>
+          <p>Coma todas as bolinhas do mapa para limpar a fase. As bolinhas grandes ativam o poder temporario e deixam o Pac-Man mais rapido.</p>
+        </div>
+        <div class="tutorial-block">
+          <h3>Fantasmas</h3>
+          <p>Os fantasmas patrulham o mapa e podem perseguir voce quando enxergam o Pac-Man em linha reta. Durante o poder, eles ficam vulneraveis e podem ser derrotados.</p>
+        </div>
+        <div class="tutorial-block">
+          <h3>Boss</h3>
+          <p>O boss aparece no fim da fase, e alterna entre momentos de descanso e arrancadas muito rapidas. No boss, usar o poder deixa o Pac-Man tao rapido quanto a investida dele.</p>
+        </div>
+        <div class="tutorial-block">
+          <h3>Comandos</h3>
+          <p>Desktop: use Setas ou WASD para mover, e Espaco para pausar.</p>
+          <p>Celular: arraste na tela para mover e toque 2x no mapa para pausar.</p>
+        </div>
+        <div class="tutorial-block">
+          <h3>Progressao</h3>
+          <p>Ao limpar todas as bolinhas do Level 1, o jogo libera o Level 2 e pede novamente um comando de inicio para comecar a nova fase.</p>
+        </div>
+      </div>
+    </section>
   </div>
   <script type="module" src="./src/main.js"></script>
 </body>

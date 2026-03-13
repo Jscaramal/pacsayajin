@@ -23,6 +23,11 @@ export function bindKeyboard(game) {
         secretBuffer = "";
         return;
       }
+      if (secretBuffer.endsWith("l2")) {
+        game.triggerLevel2Test();
+        secretBuffer = "";
+        return;
+      }
     }
 
     if (key === "b") {

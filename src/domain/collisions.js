@@ -90,9 +90,6 @@ export function resetRoundActors(state) {
 
 export function hasWon(state) {
   if (state.pelletsLeft > 0) return false;
-  state.won = true;
-  state.gameOver = true;
-  state.audio.playWin();
   return true;
 }
 

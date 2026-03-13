@@ -19,6 +19,7 @@ export class CanvasRenderer {
   drawMap(state) {
     const { ctx, canvas } = this;
     const bossActive = state.ghosts.some((ghost) => ghost.isBoss);
+    const levelTwo = state.currentLevel === 2;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "#000";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -30,9 +31,15 @@ export class CanvasRenderer {
         const py = y * TILE;
 
         if (cell === "#") {
-          ctx.fillStyle = bossActive ? "#0b1d6b" : "#163cff";
+          const wallFill = levelTwo
+            ? (bossActive ? "#3d0d57" : "#6d2bbd")
+            : (bossActive ? "#0b1d6b" : "#163cff");
+          const wallStroke = levelTwo
+            ? (bossActive ? "rgba(245, 210, 255, 0.3)" : "#d49cff")
+            : (bossActive ? "rgba(210, 220, 255, 0.28)" : "#77a0ff");
+          ctx.fillStyle = wallFill;
           roundRect(ctx, px + 2, py + 2, TILE - 4, TILE - 4, 8, true, false);
-          ctx.strokeStyle = bossActive ? "rgba(210, 220, 255, 0.28)" : "#77a0ff";
+          ctx.strokeStyle = wallStroke;
           ctx.lineWidth = 2;
           roundRect(ctx, px + 4, py + 4, TILE - 8, TILE - 8, 6, false, true);
 
@@ -291,14 +298,22 @@ export class CanvasRenderer {
       ctx.strokeStyle = "rgba(0, 0, 0, 0.9)";
       ctx.strokeText("Insira seu Nick no campo e clique em Start.", canvas.width / 2, canvas.height / 2 + 26);
       ctx.fillText("Insira seu Nick no campo e clique em Start.", canvas.width / 2, canvas.height / 2 + 26);
+    } else if (state.levelTransition) {
+      ctx.fillText(`LEVEL ${state.currentLevel}`, canvas.width / 2, canvas.height / 2 - 10);
+      ctx.fillStyle = "#fff";
+      ctx.font = "bold 18px Arial";
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = "rgba(0, 0, 0, 0.92)";
+      ctx.strokeText("Use seta, WASD ou arraste na tela para comecar", canvas.width / 2, canvas.height / 2 + 26);
+      ctx.fillText("Use seta, WASD ou arraste na tela para comecar", canvas.width / 2, canvas.height / 2 + 26);
     } else if (!state.started) {
       ctx.fillText("PRONTO!", canvas.width / 2, canvas.height / 2 - 10);
       ctx.fillStyle = "#fff";
       ctx.font = "bold 18px Arial";
       ctx.lineWidth = 6;
       ctx.strokeStyle = "rgba(0, 0, 0, 0.92)";
-      ctx.strokeText("Pressione uma seta ou WASD para comecar", canvas.width / 2, canvas.height / 2 + 26);
-      ctx.fillText("Pressione uma seta ou WASD para comecar", canvas.width / 2, canvas.height / 2 + 26);
+      ctx.strokeText("Use seta, WASD ou arraste na tela para comecar", canvas.width / 2, canvas.height / 2 + 26);
+      ctx.fillText("Use seta, WASD ou arraste na tela para comecar", canvas.width / 2, canvas.height / 2 + 26);
     } else if (state.bossIntroTimer > 0) {
       const step = Math.max(1, Math.ceil((state.bossIntroTimer / state.bossIntroDuration) * 3));
       ctx.fillStyle = "#fff";
@@ -317,8 +332,8 @@ export class CanvasRenderer {
       ctx.font = "bold 18px Arial";
       ctx.lineWidth = 6;
       ctx.strokeStyle = "rgba(0, 0, 0, 0.92)";
-      ctx.strokeText("Pressione espaco para continuar", canvas.width / 2, canvas.height / 2 + 26);
-      ctx.fillText("Pressione espaco para continuar", canvas.width / 2, canvas.height / 2 + 26);
+      ctx.strokeText("Pressione espaco ou toque 2x para continuar", canvas.width / 2, canvas.height / 2 + 26);
+      ctx.fillText("Pressione espaco ou toque 2x para continuar", canvas.width / 2, canvas.height / 2 + 26);
     } else if (state.won) {
       ctx.fillText("YOU WIN!", canvas.width / 2, canvas.height / 2 - 10);
       ctx.fillStyle = "#fff";
