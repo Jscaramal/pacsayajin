@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PAC-SAYAJIN</title>
+  <link rel="stylesheet" href="./styles/main.css" />
+</head>
+<body>
+  <div class="shell">
+    <main class="game-column">
+      <h1 class="title">PAC-SAYAJIN</h1>
+      <section class="hud">
+        <div class="panel"><span class="label">Pontos</span><span class="value" id="score">0</span></div>
+        <div class="panel"><span class="label">Recorde</span><span class="value" id="highscore">0</span></div>
+        <div class="panel"><span class="label">Vidas</span><span class="value hearts" id="lives">❤❤❤</span></div>
+        <div class="panel"><span class="label">Status</span><span class="value status" id="status">Pronto</span></div>
+      </section>
+      <canvas id="game" width="588" height="588" aria-label="PAC-SAYAJIN"></canvas>
+      <section class="controls">
+        <span><b>Movimento</b> setas ou WASD</span>
+        <span><b>Pausa</b> espaço</span>
+        <button id="restartBtn" type="button">Reiniciar</button>
+      </section>
+    </main>
+    <aside class="sidebar">
+      <section class="sidebar-card">
+        <h2 class="sidebar-title">Jogador</h2>
+        <div class="start-form">
+          <label class="label" for="nicknameInput">Nick</label>
+          <div class="start-row">
+            <input id="nicknameInput" type="text" maxlength="16" placeholder="Digite seu nick" />
+            <button id="startBtn" type="button">Start</button>
+          </div>
+          <div class="helper-text" id="playerHint">Defina seu nick para salvar o ranking.</div>
+        </div>
+      </section>
+      <section class="sidebar-card">
+        <h2 class="sidebar-title">Ranking</h2>
+        <div class="ranking-list" id="rankingList">
+          <div class="empty-ranking">Ainda nao ha pontuacoes salvas.</div>
+        </div>
+      </section>
+    </aside>
+  </div>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
