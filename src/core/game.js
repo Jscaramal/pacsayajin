@@ -206,6 +206,11 @@ export class Game {
     this.render();
   }
 
+  triggerLevel2Test() {
+    if (this.state.gameOver || !this.state.secretDebugEnabled) return;
+    this.advanceToNextLevel();
+  }
+
   tick() {
     const { state } = this;
     if (!state.started || state.paused || state.gameOver) return;
