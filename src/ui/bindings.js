@@ -22,6 +22,7 @@ export function bindUi(game, elements) {
     game.setNickname(nickname);
   });
 
+  bindInfoModal(elements);
   bindTouchControls(game, elements);
 }
 
@@ -130,4 +131,26 @@ function bindCanvasSwipe(game, canvas) {
 
   canvas.addEventListener("touchend", clearTouch, { passive: true });
   canvas.addEventListener("touchcancel", clearTouch, { passive: true });
+}
+
+function bindInfoModal(elements) {
+  const open = () => {
+    elements.infoModal.classList.remove("hidden");
+    elements.infoModal.setAttribute("aria-hidden", "false");
+  };
+
+  const close = () => {
+    elements.infoModal.classList.add("hidden");
+    elements.infoModal.setAttribute("aria-hidden", "true");
+  };
+
+  elements.infoBtn.addEventListener("click", open);
+  elements.closeInfoBtn.addEventListener("click", close);
+  elements.infoModal.addEventListener("click", (event) => {
+    if (event.target === elements.infoModal) close();
+  });
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") close();
+  });
 }

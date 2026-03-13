@@ -18,12 +18,15 @@ const elements = {
   highscore: document.getElementById("highscore"),
   lives: document.getElementById("lives"),
   status: document.getElementById("status"),
+  infoBtn: document.getElementById("infoBtn"),
   restartBtn: document.getElementById("restartBtn"),
   startBtn: document.getElementById("startBtn"),
   nickname: document.getElementById("nicknameInput"),
   rankingList: document.getElementById("rankingList"),
   playerHint: document.getElementById("playerHint"),
-  appVersion: document.getElementById("appVersion")
+  appVersion: document.getElementById("appVersion"),
+  infoModal: document.getElementById("infoModal"),
+  closeInfoBtn: document.getElementById("closeInfoBtn")
 };
 
 elements.appVersion.textContent = `Version ${APP_VERSION}`;
