@@ -111,13 +111,7 @@ canvas {
 .touch-controls {
   display: none;
   width: min(96vw, 560px);
-  grid-template-columns: repeat(3, minmax(64px, 88px));
-  grid-template-areas:
-    ". up ."
-    "left pause right"
-    ". down .";
   justify-content: center;
-  gap: 10px;
   touch-action: none;
 }
 
@@ -134,12 +128,7 @@ canvas {
   touch-action: manipulation;
 }
 
-.touch-up { grid-area: up; }
-.touch-left { grid-area: left; }
-.touch-right { grid-area: right; }
-.touch-down { grid-area: down; }
 .touch-pause {
-  grid-area: pause;
   background: rgba(255, 255, 255, 0.88);
 }
 
@@ -341,7 +330,14 @@ input:focus {
   }
 
   .touch-controls {
-    display: grid;
+    display: flex;
+  }
+
+  .touch-up,
+  .touch-left,
+  .touch-right,
+  .touch-down {
+    display: none;
   }
 
   canvas,
