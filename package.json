@@ -3,6 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "node --check src/main.js"
+    "check": "node --check src/main.js",
+    "test": "mocha \"tests/**/*.test.js\""
+  },
+  "devDependencies": {
+    "mocha": "^10.8.2"
   }
 }
