@@ -38,3 +38,7 @@ O repositorio foi preparado para publicar o jogo via GitHub Pages a partir do pr
 URL esperada:
 
 `https://jscaramal.github.io/pacsayajin/`
+
+## CI
+
+Pull requests passam por validacao automatica de testes e checagem sintatica.
