@@ -1,5 +1,4 @@
 import {
-  AUTO_POWER_INTERVAL,
   BOSS_BANNER_DURATION,
   BOSS_INTRO_DURATION,
   FPS,
@@ -59,7 +58,6 @@ export class Game {
       damageFlashTimer: 0,
       invulnerableTimer: 0,
       safeTimer: 0,
-      autoPowerInterval: AUTO_POWER_INTERVAL,
       eatenGhostCombo: 0,
       bossTriggered: false,
       bossIntroTimer: 0,
@@ -213,8 +211,8 @@ export class Game {
     this.render();
   }
 
-  goToLevelTest(levelNumber) {
-    if (this.state.gameOver || !this.state.secretDebugEnabled) return;
+  goToLevel(levelNumber, force = false) {
+    if (this.state.gameOver || (!this.state.secretDebugEnabled && !force)) return;
     if (!LEVELS[levelNumber]) return;
 
     this.state.started = false;
@@ -223,6 +221,10 @@ export class Game {
     this.applyLevelToState(this.state, levelNumber);
     this.state.levelTransition = true;
     this.render();
+  }
+
+  goToLevelTest(levelNumber) {
+    this.goToLevel(levelNumber);
   }
 
   tick() {
@@ -306,7 +308,7 @@ export class Game {
   }
 
   advanceToNextLevel() {
-    this.goToLevelTest(this.state.currentLevel + 1);
+    this.goToLevel(this.state.currentLevel + 1, true);
   }
 
   render() {

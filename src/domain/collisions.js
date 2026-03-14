@@ -1,5 +1,4 @@
 import {
-  AUTO_POWER_DURATION,
   BOSS_THRESHOLD,
   DAMAGE_FLASH_FRAMES,
   DAMAGE_RESPAWN_FRAMES,
@@ -62,10 +61,6 @@ export function updatePowerMode(state) {
 export function updateSurvivalTimer(state) {
   if (state.frightenedTimer > 0 || state.gameOver || !state.started) return;
   state.safeTimer += 1;
-  if (state.safeTimer >= state.autoPowerInterval) {
-    activatePower(state, AUTO_POWER_DURATION);
-    state.audio.playPower();
-  }
 }
 
 export function activatePower(state, duration) {
